@@ -57,28 +57,34 @@ One can configure whether specific log entries are logged out and where they get
 
 ### Exec Actions
 
-You have different options to execute a command through an action.
+Use `executeCommandLine` to run single-line commands or execute scripts.
 
-- `executeCommandLine(String commandLine)`: Executes a command on the command line without waiting for the command to complete.
-  For example you could run `executeCommandLine("path/to/my/script.sh")` which then would be executed and the rule would continue processing.
+- `executeCommandLine(String commandLine)`.
+  For example, `executeCommandLine("path/to/my/script.sh")` will execute `script.sh` and then continue processing the rule.
+- If your command line has spaces in it, separate each phrase with `","`.
+  For example, `sudo poweroff -r` would become  `executeCommandLine("sudo","poweroff","-r")`.
 
-- `executeCommandLine(Duration.ofSeconds(timeout), String commandLine)`: Executes a command on the command and waits `timeout` seconds for the command to complete, returning the output from the command as a String.
-  For example you could run `var ScriptResponse = executeCommandLine(Duration.ofSeconds(60), "path/to/my/script.sh");` would get executed and wait 1 minute for the output to be responded back and write it into the `ScriptResponse` variable.
+#### Commands with responses
+
+If you need a response from your system, set a `timeout` duration. openHAB will wait `timeout` seconds for the command to complete, then return the output from the command as a String.
+
+- `executeCommandLine(Duration.ofSeconds(timeout), String commandLine)`.
+  For example, `var ScriptResponse = executeCommandLine(Duration.ofSeconds(60), "path/to/my/script.sh");` will execute the script, wait 60 seconds, and then write the output into the `ScriptResponse` variable.
 
 Other Durations than `ofSeconds` units are possible too.
 Check out the [Java Documentation](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/Duration.html?is-external=true) for possible units.
 
 #### Scripts with parameters
 
-Let's assume that your `path/to/my/script.sh`-Script needs two item states to process them with some calculation.
-In console you would call it like
+Let's assume that your `path/to/my/script.sh` script needs two item states to process them with some calculation.
+In console you would call it like this:
 
 ```text
 path/to/my/script.sh itemState1 itemState2
 ```
 
-To solve this constellation within a rule you have to add one argument per script parameter to the function.
-The script above would be configured like shown below.
+To solve this constellation within a rule, you have to add one argument per script parameter to the function.
+The script above would be configured as follows.
 
 ```text
 // When you are not interested in the script output
